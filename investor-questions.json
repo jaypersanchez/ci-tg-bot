@@ -1,0 +1,64 @@
+{
+    "questions": [
+        {
+            "question": "What are the current price trends for Bitcoin?"
+        },
+        {
+            "question": "How has the price of Ethereum changed over the past week?"
+        },
+        {
+            "question": "What is the volatility of Cardano compared to others?"
+        },
+        {
+            "question": "Can you compare the performance of Bitcoin and Ethereum?"
+        },
+        {
+            "question": "Which cryptocurrencies have performed the best over the last month?"
+        },
+        {
+            "question": "What are the top-performing cryptocurrencies in the last quarter?"
+        },
+        {
+            "question": "What is the forecast for Litecoin over the next month?"
+        },
+        {
+            "question": "Can you provide a price prediction for Solana?"
+        },
+        {
+            "question": "What factors are influencing the forecast for Ripple?"
+        },
+        {
+            "question": "What are the current support and resistance levels for Polkadot?"
+        },
+        {
+            "question": "How do these levels compare to historical data?"
+        },
+        {
+            "question": "What insights can you provide about the market sentiment for Chainlink?"
+        },
+        {
+            "question": "Are there any significant news events affecting Dogecoin right now?"
+        },
+        {
+            "question": "What are the potential risks associated with investing in Shiba Inu?"
+        },
+        {
+            "question": "What are some recommended strategies for investing in cryptocurrencies?"
+        },
+        {
+            "question": "How should I diversify my crypto portfolio?"
+        },
+        {
+            "question": "What are the best practices for managing risk in crypto investments?"
+        },
+        {
+            "question": "What is Bitcoin and what technology does it use?"
+        },
+        {
+            "question": "Who are the key players or developers behind Ethereum?"
+        },
+        {
+            "question": "What are the use cases for Cardano?"
+        }
+    ]
+}
