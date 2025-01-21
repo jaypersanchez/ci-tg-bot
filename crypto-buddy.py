@@ -17,7 +17,7 @@ app = Flask(__name__)
 # Load NLP model (e.g., spaCy)
 nlp = spacy.load("en_core_web_sm")  # Load the English NLP model
 
-# Define the AI server URL
+# Load environment variables
 AI_SERVER_URL = os.getenv('AI_SERVER_URL')  # e.g., "http://localhost:5001"
 TELEGRAM_API_KEY = os.getenv('TELEGRAM_API_KEY')  # Telegram bot API key
 
@@ -30,60 +30,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle incoming messages."""
-    user_question = update.message.text
-    response = ask_crypto_buddy(user_question)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=response)
-
-def ask_crypto_buddy(user_question):
-    # Step 2: NLP to determine intent and extract cryptocurrency name
-    intent, crypto_name = determine_intent_and_crypto(user_question)
-
-    # Step 3: Prepare the request to the AI server based on the intent
-    if intent and crypto_name:
-        response = trigger_ai_server(intent, crypto_name)
-        return response
+    user_question = update.message.text.lower()
+    
+    # Determine intent based on keywords in the user question
+    if "volatility" in user_question:
+        intent = "volatility"
+    elif "price" in user_question:
+        intent = "price trends"
     else:
-        return "Could not determine intent or cryptocurrency."
+        intent = "unknown"
 
-def determine_intent_and_crypto(question):
-    # Normalize the question
-    question = question.lower().strip()
+    # Extract the cryptocurrency name from the user question
+    crypto_name = "Bitcoin"  # This should be extracted based on user input
 
-    # Define intents and their keywords
-    intents = {
-        "price trends": ["price trend", "current price trend", "price trends"],
-        "performance comparison": ["compare", "performance comparison"],
-        "forecast": ["forecast", "price prediction"],
-        "support and resistance": ["support", "resistance", "support and resistance"],
-        "analytical insights": ["insight", "analytical insights"]
-    }
-
-    # Initialize variables
-    crypto_name = None
-    intent = None
-
-    # Check for intent using fuzzy matching
-    for key, keywords in intents.items():
-        # Use fuzzy matching to find the best match
-        match, score = process.extractOne(question, keywords)
-        if score >= 80:  # You can adjust the threshold as needed
-            intent = key
-            break
-
-    # List of known cryptocurrencies
-    known_cryptos = ["bitcoin", "ethereum", "litecoin", "cardano", "ripple", "solana", "polkadot"]
-
-    # Extract cryptocurrency name using regex
-    for token in known_cryptos:
-        if re.search(r'\b' + re.escape(token) + r'\b', question):
-            crypto_name = token
-            break
-
-    print("Question:", question)  # Debugging output
-    print("Intent:", intent)  # Debugging output
-    print("Crypto Name:", crypto_name)  # Debugging output
-
-    return intent, crypto_name
+    # Call the AI server based on the determined intent
+    response = trigger_ai_server(intent, crypto_name)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=response)
 
 def get_coin_id(crypto_name):
     """Fetch the coin_id from the AI server based on the crypto name."""
@@ -111,12 +73,35 @@ def trigger_ai_server(intent, crypto_name):
             print("Response Text:", response.text)  # Print the raw response text
 
             try:
-                return response.json().get('response', 'No response from server.')
+                return response.json().get('historical_data', 'No response from server.')
             except ValueError as e:
                 print("Error parsing JSON:", e)
                 return "Error parsing response from server."
         else:
             return "Could not find the coin ID for the specified cryptocurrency."
+
+    elif intent == "volatility":
+        coin_id = get_coin_id(crypto_name)
+        if coin_id:
+            # Construct the full URL for the volatility request
+            url = f"{AI_SERVER_URL}/api/volatility?coin_id={coin_id}&timeframe=month"
+            print(f"Calling AI server at: {url}")  # Debugging output
+
+            # Make a GET request to fetch volatility
+            response = requests.get(url)
+
+            # Debugging output to check the response
+            print("Response Status Code:", response.status_code)
+            print("Response Text:", response.text)  # Print the raw response text
+
+            try:
+                return response.json().get('volatility', 'No response from server.')
+            except ValueError as e:
+                print("Error parsing JSON:", e)
+                return "Error parsing response from server."
+        else:
+            return "Could not find the coin ID for the specified cryptocurrency."
+
     else:
         return "Invalid intent."
 
